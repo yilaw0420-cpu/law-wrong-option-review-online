@@ -1,0 +1,8 @@
+/config.js
+  Cache-Control: no-store
+
+/vendor/tesseract/*
+  Cache-Control: public, max-age=31536000, immutable
+
+/vendor/tesseract/*.wasm
+  Content-Type: application/wasm

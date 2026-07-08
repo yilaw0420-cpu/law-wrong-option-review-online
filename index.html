@@ -1,0 +1,2688 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>法考错选复习</title>
+  <script src="./config.js"></script>
+  <script src="./vendor/tesseract/tesseract.min.js"></script>
+  <style>
+    :root {
+      --bg: #f6f7f5;
+      --surface: #ffffff;
+      --surface-2: #eef4f1;
+      --ink: #1e2420;
+      --muted: #68736d;
+      --line: #d9dfda;
+      --teal: #157f72;
+      --teal-2: #0e5f55;
+      --coral: #d9594c;
+      --gold: #c9962d;
+      --green-soft: #dff0ea;
+      --red-soft: #f8e4e1;
+      --gold-soft: #f5ead0;
+      --shadow: 0 18px 45px rgba(38, 52, 47, 0.09);
+      --radius: 8px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      min-height: 100%;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+      letter-spacing: 0;
+    }
+
+    body {
+      min-height: 100vh;
+      margin: 0;
+      background:
+        linear-gradient(90deg, rgba(21, 127, 114, 0.07) 0 1px, transparent 1px 100%),
+        linear-gradient(180deg, rgba(217, 89, 76, 0.04) 0 1px, transparent 1px 100%),
+        var(--bg);
+      background-size: 42px 42px;
+    }
+
+    button,
+    input,
+    textarea,
+    select {
+      font: inherit;
+    }
+
+    button {
+      border: 0;
+      cursor: pointer;
+      color: inherit;
+    }
+
+    i[data-lucide] {
+      width: 18px;
+      height: 18px;
+      display: inline-grid;
+      place-items: center;
+      flex: 0 0 auto;
+    }
+
+    i[data-lucide] svg {
+      width: 100%;
+      height: 100%;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    button:disabled {
+      cursor: not-allowed;
+      opacity: 0.58;
+    }
+
+    .app {
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: 320px minmax(0, 1fr);
+    }
+
+    .rail {
+      min-height: 100vh;
+      padding: 24px 18px;
+      background: rgba(255, 255, 255, 0.82);
+      border-right: 1px solid var(--line);
+      backdrop-filter: blur(12px);
+      position: sticky;
+      top: 0;
+      align-self: start;
+    }
+
+    .brand {
+      display: grid;
+      grid-template-columns: 46px minmax(0, 1fr);
+      gap: 12px;
+      align-items: center;
+      margin-bottom: 22px;
+    }
+
+    .mark {
+      width: 46px;
+      height: 46px;
+      display: grid;
+      place-items: center;
+      color: white;
+      border-radius: var(--radius);
+      background:
+        radial-gradient(circle at 72% 26%, rgba(255, 255, 255, 0.46), transparent 18px),
+        linear-gradient(145deg, var(--teal), var(--coral));
+      box-shadow: 0 12px 24px rgba(21, 127, 114, 0.20);
+    }
+
+    .mark i[data-lucide] {
+      width: 25px;
+      height: 25px;
+    }
+
+    .brand h1 {
+      margin: 0;
+      font-size: 19px;
+      line-height: 1.15;
+      font-weight: 780;
+    }
+
+    .brand p {
+      margin: 5px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .nav {
+      display: grid;
+      gap: 8px;
+      margin-bottom: 18px;
+    }
+
+    .nav button,
+    .ghost-button,
+    .icon-button,
+    .primary-button,
+    .danger-button,
+    .soft-button {
+      min-height: 40px;
+      border-radius: var(--radius);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 0 12px;
+      border: 1px solid transparent;
+      white-space: nowrap;
+    }
+
+    .nav button {
+      justify-content: flex-start;
+      background: transparent;
+      color: var(--muted);
+    }
+
+    .nav button.is-active {
+      background: var(--green-soft);
+      color: var(--teal-2);
+      border-color: rgba(21, 127, 114, 0.14);
+      font-weight: 720;
+    }
+
+    .nav button:hover,
+    .ghost-button:hover,
+    .soft-button:hover,
+    .icon-button:hover {
+      background: var(--surface-2);
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+      margin: 18px 0;
+    }
+
+    .stat {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 12px;
+      min-height: 74px;
+    }
+
+    .stat span {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .stat strong {
+      display: block;
+      margin-top: 5px;
+      font-size: 24px;
+      line-height: 1;
+    }
+
+    .side-tools {
+      display: grid;
+      gap: 9px;
+    }
+
+    .file-button input {
+      position: absolute;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .file-button {
+      position: relative;
+    }
+
+    main {
+      padding: 24px;
+      min-width: 0;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 18px;
+    }
+
+    .topbar-title h2 {
+      margin: 0;
+      font-size: clamp(24px, 3vw, 38px);
+      line-height: 1.05;
+      font-weight: 820;
+    }
+
+    .topbar-title p {
+      margin: 8px 0 0;
+      color: var(--muted);
+      max-width: 760px;
+      line-height: 1.55;
+    }
+
+    .toolbar {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .panel {
+      background: rgba(255, 255, 255, 0.9);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow: clip;
+    }
+
+    .panel-head {
+      min-height: 58px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.72);
+    }
+
+    .panel-head h3 {
+      margin: 0;
+      font-size: 17px;
+    }
+
+    .panel-body {
+      padding: 16px;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: minmax(0, 1.07fr) minmax(330px, 0.93fr);
+      gap: 16px;
+      align-items: start;
+    }
+
+    .field {
+      display: grid;
+      gap: 7px;
+      margin-bottom: 14px;
+    }
+
+    .field label {
+      color: #3b4640;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .field input,
+    .field textarea,
+    .field select,
+    .searchbar input {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--surface);
+      color: var(--ink);
+      outline: none;
+    }
+
+    .field input,
+    .field select,
+    .searchbar input {
+      height: 42px;
+      padding: 0 12px;
+    }
+
+    .field textarea {
+      min-height: 128px;
+      padding: 12px;
+      line-height: 1.55;
+      resize: vertical;
+    }
+
+    .field input:focus,
+    .field textarea:focus,
+    .field select:focus,
+    .searchbar input:focus {
+      border-color: rgba(21, 127, 114, 0.72);
+      box-shadow: 0 0 0 4px rgba(21, 127, 114, 0.12);
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .option-editor {
+      display: grid;
+      gap: 8px;
+    }
+
+    .option-row {
+      display: grid;
+      grid-template-columns: 42px minmax(0, 1fr);
+      gap: 8px;
+      align-items: center;
+    }
+
+    .letter {
+      height: 42px;
+      display: grid;
+      place-items: center;
+      border-radius: var(--radius);
+      background: var(--surface-2);
+      border: 1px solid var(--line);
+      font-weight: 800;
+      color: #445047;
+    }
+
+    .wrong-picker {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .wrong-picker label {
+      width: 48px;
+      height: 40px;
+      border-radius: var(--radius);
+      border: 1px solid var(--line);
+      background: var(--surface);
+      display: grid;
+      place-items: center;
+      font-weight: 820;
+      color: var(--muted);
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .wrong-picker input {
+      position: absolute;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .wrong-picker label:has(input:checked) {
+      color: var(--coral);
+      border-color: rgba(217, 89, 76, 0.42);
+      background: var(--red-soft);
+      box-shadow: inset 0 0 0 1px rgba(217, 89, 76, 0.08);
+    }
+
+    .button-row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      align-items: center;
+      margin-top: 14px;
+    }
+
+    .primary-button {
+      color: #fff;
+      background: var(--teal);
+      font-weight: 780;
+      box-shadow: 0 12px 20px rgba(21, 127, 114, 0.17);
+    }
+
+    .primary-button:hover {
+      background: var(--teal-2);
+    }
+
+    .soft-button {
+      color: var(--teal-2);
+      background: var(--green-soft);
+      border-color: rgba(21, 127, 114, 0.14);
+      font-weight: 720;
+    }
+
+    .ghost-button {
+      background: var(--surface);
+      border-color: var(--line);
+      color: #34423b;
+    }
+
+    .danger-button {
+      color: var(--coral);
+      background: var(--red-soft);
+      border-color: rgba(217, 89, 76, 0.20);
+      font-weight: 720;
+    }
+
+    .icon-button {
+      width: 40px;
+      padding: 0;
+      background: var(--surface);
+      border-color: var(--line);
+    }
+
+    .searchbar {
+      display: grid;
+      grid-template-columns: minmax(180px, 1fr) 160px 160px;
+      gap: 10px;
+      align-items: center;
+      margin-bottom: 14px;
+    }
+
+    .subject-collections {
+      margin-bottom: 14px;
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: rgba(255, 255, 255, 0.72);
+    }
+
+    .subject-collections-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .subject-collections-head h3 {
+      margin: 0;
+      font-size: 16px;
+    }
+
+    .collection-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(136px, 1fr));
+      gap: 9px;
+    }
+
+    .collection-button {
+      min-height: 68px;
+      display: grid;
+      gap: 6px;
+      align-content: center;
+      justify-items: start;
+      padding: 10px 11px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--surface);
+      text-align: left;
+    }
+
+    .collection-button strong {
+      font-size: 15px;
+    }
+
+    .collection-button span {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .collection-button.is-active {
+      border-color: rgba(21, 127, 114, 0.34);
+      background: var(--green-soft);
+      color: var(--teal-2);
+    }
+
+    .list {
+      display: grid;
+      gap: 12px;
+    }
+
+    .question-card {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+
+    .question-main {
+      padding: 14px;
+      display: grid;
+      gap: 12px;
+    }
+
+    .card-meta {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      flex-wrap: wrap;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .pill {
+      display: inline-flex;
+      min-height: 26px;
+      align-items: center;
+      gap: 6px;
+      border-radius: 999px;
+      padding: 0 9px;
+      background: var(--surface-2);
+      color: #52605a;
+      border: 1px solid rgba(0, 0, 0, 0.04);
+      max-width: 100%;
+    }
+
+    .pill.is-wrong {
+      background: var(--red-soft);
+      color: #a7342b;
+      border-color: rgba(217, 89, 76, 0.16);
+      font-weight: 760;
+    }
+
+    .pill.is-mastered {
+      background: var(--green-soft);
+      color: var(--teal-2);
+    }
+
+    .question-text {
+      margin: 0;
+      white-space: pre-wrap;
+      line-height: 1.72;
+      font-size: 16px;
+      word-break: break-word;
+    }
+
+    .wrong-options {
+      display: grid;
+      gap: 8px;
+    }
+
+    .wrong-option {
+      border: 1px solid rgba(217, 89, 76, 0.22);
+      background: var(--red-soft);
+      color: #47211e;
+      border-radius: var(--radius);
+      padding: 10px 11px;
+      line-height: 1.55;
+      display: grid;
+      grid-template-columns: 30px minmax(0, 1fr);
+      gap: 7px;
+      align-items: start;
+    }
+
+    .wrong-option strong {
+      color: var(--coral);
+    }
+
+    .card-actions {
+      display: flex;
+      gap: 8px;
+      justify-content: flex-end;
+      align-items: center;
+      padding: 10px 14px;
+      background: #fbfcfb;
+      border-top: 1px solid var(--line);
+      flex-wrap: wrap;
+    }
+
+    .empty {
+      min-height: 360px;
+      display: grid;
+      place-items: center;
+      text-align: center;
+      color: var(--muted);
+      border: 1px dashed var(--line);
+      border-radius: var(--radius);
+      background: rgba(255, 255, 255, 0.48);
+      padding: 28px;
+    }
+
+    .empty-icon {
+      width: 56px;
+      height: 56px;
+      display: grid;
+      place-items: center;
+      margin: 0 auto 12px;
+      border-radius: var(--radius);
+      color: var(--gold);
+      background: var(--gold-soft);
+    }
+
+    .empty h3 {
+      color: var(--ink);
+      margin: 0 0 7px;
+      font-size: 18px;
+    }
+
+    .empty p {
+      max-width: 460px;
+      margin: 0;
+      line-height: 1.6;
+    }
+
+    .preview-box {
+      display: grid;
+      gap: 12px;
+    }
+
+    .preview-paper {
+      min-height: 280px;
+      border: 1px solid var(--line);
+      background:
+        linear-gradient(#fff 0 0) padding-box,
+        linear-gradient(135deg, rgba(21, 127, 114, 0.42), rgba(217, 89, 76, 0.38)) border-box;
+      border-radius: var(--radius);
+      padding: 18px;
+    }
+
+    .preview-paper h4 {
+      margin: 0 0 12px;
+      font-size: 15px;
+      color: var(--muted);
+    }
+
+    .preview-paper p {
+      margin: 0;
+      white-space: pre-wrap;
+      line-height: 1.75;
+    }
+
+    .progress {
+      min-height: 34px;
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .progress-bar {
+      height: 8px;
+      width: 160px;
+      border-radius: 999px;
+      background: var(--surface-2);
+      overflow: hidden;
+      border: 1px solid var(--line);
+    }
+
+    .progress-bar span {
+      display: block;
+      height: 100%;
+      width: var(--value, 0%);
+      background: linear-gradient(90deg, var(--teal), var(--gold));
+      transition: width 160ms ease;
+    }
+
+    .attachment {
+      display: grid;
+      grid-template-columns: 84px minmax(0, 1fr) 40px;
+      gap: 10px;
+      align-items: center;
+      margin-top: 12px;
+      padding: 10px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: #fbfcfb;
+    }
+
+    .attachment img,
+    .source-image {
+      width: 100%;
+      aspect-ratio: 4 / 3;
+      object-fit: cover;
+      border-radius: var(--radius);
+      border: 1px solid var(--line);
+      background: var(--surface-2);
+    }
+
+    .attachment strong {
+      display: block;
+      font-size: 13px;
+      margin-bottom: 3px;
+    }
+
+    .attachment span {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.45;
+    }
+
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: 22px;
+      transform: translateX(-50%) translateY(20px);
+      opacity: 0;
+      pointer-events: none;
+      background: #1f2823;
+      color: white;
+      border-radius: var(--radius);
+      padding: 12px 14px;
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.22);
+      z-index: 40;
+      transition: opacity 160ms ease, transform 160ms ease;
+      max-width: min(520px, calc(100vw - 32px));
+      line-height: 1.45;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    .dialog-backdrop {
+      position: fixed;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      padding: 18px;
+      background: rgba(18, 24, 21, 0.38);
+      z-index: 30;
+    }
+
+    .dialog {
+      width: min(720px, 100%);
+      max-height: calc(100vh - 36px);
+      overflow: auto;
+      background: var(--surface);
+      border-radius: var(--radius);
+      border: 1px solid var(--line);
+      box-shadow: 0 26px 70px rgba(0, 0, 0, 0.22);
+    }
+
+    .dialog .panel-head {
+      position: sticky;
+      top: 0;
+      z-index: 1;
+    }
+
+    .crop-dialog {
+      width: min(1080px, 100%);
+    }
+
+    .crop-frame {
+      position: relative;
+      width: fit-content;
+      max-width: 100%;
+      margin: 0 auto;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      overflow: hidden;
+      background: #111;
+      touch-action: none;
+    }
+
+    .crop-frame img {
+      display: block;
+      max-width: 100%;
+      max-height: min(68vh, 720px);
+      user-select: none;
+      -webkit-user-drag: none;
+    }
+
+    .crop-shade {
+      position: absolute;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.38);
+      pointer-events: none;
+    }
+
+    .crop-selection {
+      position: absolute;
+      border: 2px solid #fff;
+      outline: 9999px solid rgba(0, 0, 0, 0.38);
+      box-shadow: 0 0 0 1px rgba(21, 127, 114, 0.72), inset 0 0 0 1px rgba(21, 127, 114, 0.72);
+      background: rgba(255, 255, 255, 0.05);
+      pointer-events: none;
+    }
+
+    .crop-selection::after {
+      content: "";
+      position: absolute;
+      right: -6px;
+      bottom: -6px;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: var(--teal);
+      border: 2px solid #fff;
+    }
+
+    .crop-hint {
+      margin: 10px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.55;
+    }
+
+    .full-options {
+      display: grid;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .full-option {
+      padding: 10px 11px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      display: grid;
+      grid-template-columns: 30px minmax(0, 1fr);
+      gap: 7px;
+      line-height: 1.55;
+      background: #fbfcfb;
+    }
+
+    .full-option.is-picked {
+      border-color: rgba(217, 89, 76, 0.28);
+      background: var(--red-soft);
+    }
+
+    @media (max-width: 980px) {
+      .app {
+        grid-template-columns: 1fr;
+      }
+
+      .rail {
+        min-height: auto;
+        position: relative;
+        display: grid;
+        grid-template-columns: 1fr;
+        padding: 16px;
+      }
+
+      .nav {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+
+      .nav button {
+        justify-content: center;
+      }
+
+      .stats {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+      }
+
+      .grid-2,
+      .searchbar {
+        grid-template-columns: 1fr;
+      }
+
+      .topbar {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .toolbar {
+        justify-content: flex-start;
+      }
+    }
+
+    @media (max-width: 620px) {
+      main {
+        padding: 16px;
+      }
+
+      .rail {
+        padding: 14px;
+      }
+
+      .brand {
+        grid-template-columns: 40px minmax(0, 1fr);
+      }
+
+      .mark {
+        width: 40px;
+        height: 40px;
+      }
+
+      .nav {
+        grid-template-columns: 1fr;
+      }
+
+      .stats,
+      .form-row {
+        grid-template-columns: 1fr;
+      }
+
+      .option-row {
+        grid-template-columns: 38px minmax(0, 1fr);
+      }
+
+      .topbar-title h2 {
+        font-size: 27px;
+      }
+
+      .card-actions {
+        justify-content: flex-start;
+      }
+
+      .button-row > button,
+      .button-row > label {
+        width: 100%;
+      }
+
+      .attachment {
+        grid-template-columns: 72px minmax(0, 1fr) 40px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <aside class="rail">
+      <div class="brand">
+        <div class="mark" aria-hidden="true"><i data-lucide="scale"></i></div>
+        <div>
+          <h1>法考错选复习</h1>
+          <p>只看题目和当时错选</p>
+        </div>
+      </div>
+
+      <nav class="nav" aria-label="主导航">
+        <button class="is-active" data-view-button="review"><i data-lucide="list-checks"></i><span>复习</span></button>
+        <button data-view-button="add"><i data-lucide="scan-text"></i><span>录入</span></button>
+        <button data-view-button="manage"><i data-lucide="database"></i><span>整理</span></button>
+      </nav>
+
+      <section class="stats" aria-label="统计">
+        <div class="stat"><span>错题</span><strong id="statTotal">0</strong></div>
+        <div class="stat"><span>错选</span><strong id="statWrong">0</strong></div>
+        <div class="stat"><span>已掌握</span><strong id="statMastered">0</strong></div>
+        <div class="stat"><span>科目</span><strong id="statSubjects">0</strong></div>
+      </section>
+
+      <div class="side-tools">
+        <button class="ghost-button" id="exportButton"><i data-lucide="download"></i><span>导出</span></button>
+        <label class="ghost-button file-button">
+          <i data-lucide="upload"></i><span>导入</span>
+          <input id="importInput" type="file" accept="application/json">
+        </label>
+        <button class="danger-button" id="clearButton"><i data-lucide="trash-2"></i><span>清空</span></button>
+      </div>
+    </aside>
+
+    <main>
+      <section id="reviewView">
+        <div class="topbar">
+          <div class="topbar-title">
+            <h2>今日错选</h2>
+            <p>默认只保留题干和你当时做错的选项，适合反复看“为什么我会选它”。</p>
+          </div>
+          <div class="toolbar">
+            <button class="ghost-button" id="shuffleButton"><i data-lucide="shuffle"></i><span>随机</span></button>
+            <button class="primary-button" data-switch-view="add"><i data-lucide="plus"></i><span>新增</span></button>
+          </div>
+        </div>
+
+        <div class="searchbar">
+          <input id="searchInput" type="search" placeholder="搜索题干、错选、备注">
+          <select id="subjectFilter" aria-label="科目筛选">
+            <option value="">全部科目</option>
+          </select>
+          <select id="statusFilter" aria-label="状态筛选">
+            <option value="active">未掌握</option>
+            <option value="all">全部</option>
+            <option value="mastered">已掌握</option>
+          </select>
+        </div>
+
+        <section class="subject-collections" aria-label="学科错题集">
+          <div class="subject-collections-head">
+            <h3>学科错题集</h3>
+            <span class="pill" id="activeCollectionLabel">全部错题</span>
+          </div>
+          <div class="collection-list" id="subjectCollections"></div>
+        </section>
+
+        <div id="reviewList" class="list"></div>
+      </section>
+
+      <section id="addView" class="hidden">
+        <div class="topbar">
+          <div class="topbar-title">
+            <h2 id="formTitle">录入错题</h2>
+            <p>把竹马复制出的题目原文贴进来，也可以直接截取竹马窗口后保存到共享题库。</p>
+          </div>
+          <div class="toolbar">
+            <button class="ghost-button" id="newButton"><i data-lucide="file-plus-2"></i><span>新建</span></button>
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <section class="panel">
+            <div class="panel-head">
+              <h3>原文</h3>
+              <div class="progress" id="ocrProgress" aria-live="polite"></div>
+            </div>
+            <div class="panel-body">
+              <div class="field">
+                <label for="rawText">复制内容 / 识别结果</label>
+                <textarea id="rawText" placeholder="粘贴题干、选项、我的答案等内容"></textarea>
+              </div>
+              <div class="button-row">
+                <button class="soft-button" id="parseButton"><i data-lucide="wand-sparkles"></i><span>提取</span></button>
+                <button class="ghost-button" id="captureWindowButton"><i data-lucide="screen-share"></i><span>截取并框选</span></button>
+                <label class="ghost-button file-button">
+                  <i data-lucide="image-up"></i><span>上传图片</span>
+                  <input id="imageInput" type="file" accept="image/*">
+                </label>
+                <button class="ghost-button" id="sampleButton"><i data-lucide="clipboard"></i><span>示例</span></button>
+              </div>
+              <div class="attachment hidden" id="attachmentBox">
+                <img id="attachmentPreview" alt="已附加的截图">
+                <div>
+                  <strong id="attachmentTitle">已附加截图</strong>
+                  <span id="attachmentHint">保存后其他人也能看到这张截图。</span>
+                </div>
+                <button class="icon-button" id="clearImageButton" aria-label="移除截图"><i data-lucide="x"></i></button>
+              </div>
+            </div>
+          </section>
+
+          <section class="panel">
+            <div class="panel-head">
+              <h3>复习预览</h3>
+              <span class="pill is-wrong" id="previewWrongCount">0 个错选</span>
+            </div>
+            <div class="panel-body preview-box">
+              <div class="preview-paper">
+                <h4>只看这一面</h4>
+                <p id="previewQuestion">题干会显示在这里。</p>
+                <div id="previewWrongOptions" class="wrong-options" style="margin-top: 14px;"></div>
+              </div>
+            </div>
+          </section>
+        </div>
+
+        <section class="panel" style="margin-top: 16px;">
+          <div class="panel-head">
+            <h3>整理</h3>
+          </div>
+          <div class="panel-body">
+            <div class="form-row">
+              <div class="field">
+                <label for="subjectInput">科目</label>
+                <input id="subjectInput" list="subjectHints" placeholder="民法 / 刑法 / 行政法">
+                <datalist id="subjectHints">
+                  <option value="民法"></option>
+                  <option value="刑法"></option>
+                  <option value="行政法"></option>
+                  <option value="民诉"></option>
+                  <option value="刑诉"></option>
+                  <option value="商经"></option>
+                  <option value="理论法"></option>
+                  <option value="三国法"></option>
+                </datalist>
+              </div>
+              <div class="field">
+                <label for="sourceInput">来源</label>
+                <input id="sourceInput" placeholder="竹马刷题 / 模考 / 章节">
+              </div>
+            </div>
+
+            <div class="field">
+              <label for="questionInput">题目</label>
+              <textarea id="questionInput" placeholder="题干"></textarea>
+            </div>
+
+            <div class="field">
+              <label>选项</label>
+              <div class="option-editor" id="optionEditor"></div>
+            </div>
+
+            <div class="field">
+              <label>我错选了</label>
+              <div class="wrong-picker" id="wrongPicker"></div>
+            </div>
+
+            <div class="field">
+              <label for="noteInput">备注</label>
+              <textarea id="noteInput" placeholder="比如：混淆点、下次注意、法条关键词"></textarea>
+            </div>
+
+            <div class="button-row">
+              <button class="primary-button" id="saveButton"><i data-lucide="save"></i><span>保存</span></button>
+              <button class="ghost-button" id="resetButton"><i data-lucide="rotate-ccw"></i><span>重置</span></button>
+            </div>
+          </div>
+        </section>
+      </section>
+
+      <section id="manageView" class="hidden">
+        <div class="topbar">
+          <div class="topbar-title">
+            <h2>整理错题</h2>
+            <p>这里可以查看完整内容并修改，但复习页仍只显示题目和错选。</p>
+          </div>
+        </div>
+        <div id="manageList" class="list"></div>
+      </section>
+    </main>
+  </div>
+
+  <div id="dialogLayer" class="dialog-backdrop hidden" role="dialog" aria-modal="true"></div>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <script>
+    const LETTERS = ["A", "B", "C", "D", "E", "F"];
+    const DEFAULT_SUBJECTS = ["民法", "刑法", "行政法", "民诉", "刑诉", "商经", "理论法", "三国法"];
+    const APP_CONFIG = Object.freeze({
+      supabaseUrl: String(window.LAW_REVIEW_CONFIG?.supabaseUrl || "").replace(/\/+$/, ""),
+      supabaseAnonKey: String(window.LAW_REVIEW_CONFIG?.supabaseAnonKey || ""),
+      groupId: String(window.LAW_REVIEW_CONFIG?.groupId || "couple-law-review"),
+      tableName: String(window.LAW_REVIEW_CONFIG?.tableName || "wrong_questions"),
+    });
+    const ICON_PATHS = {
+      "book-marked": '<path d="M10 2v8l3-2 3 2V2"/><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M4 4.5A2.5 2.5 0 0 1 6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5z"/>',
+      "book-open-check": '<path d="M12 7v14"/><path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"/><path d="m16 12 2 2 4-4"/>',
+      "check": '<path d="M20 6 9 17l-5-5"/>',
+      "check-check": '<path d="M18 6 7 17l-5-5"/><path d="m22 10-7.5 7.5L13 16"/>',
+      "clipboard": '<rect width="8" height="4" x="8" y="2" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/>',
+      "database": '<ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14c0 1.7 4 3 9 3s9-1.3 9-3V5"/><path d="M3 12c0 1.7 4 3 9 3s9-1.3 9-3"/>',
+      "download": '<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/>',
+      "file-plus-2": '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M12 18v-6"/><path d="M9 15h6"/>',
+      "image-up": '<path d="M10.3 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v10"/><path d="m21 19-3-3-3 3"/><path d="M18 16v6"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.1-3.1a2 2 0 0 0-2.8 0L6 21"/>',
+      "list-checks": '<path d="m3 7 2 2 4-4"/><path d="m3 17 2 2 4-4"/><path d="M13 6h8"/><path d="M13 12h8"/><path d="M13 18h8"/>',
+      "map-pin": '<path d="M20 10c0 4.9-8 12-8 12S4 14.9 4 10a8 8 0 1 1 16 0z"/><circle cx="12" cy="10" r="3"/>',
+      "pencil": '<path d="M21.2 6.8 17.2 2.8a2 2 0 0 0-2.8 0L3 14.2V21h6.8L21.2 9.6a2 2 0 0 0 0-2.8z"/><path d="m14 4 6 6"/>',
+      "plus": '<path d="M5 12h14"/><path d="M12 5v14"/>',
+      "rotate-ccw": '<path d="M3 12a9 9 0 1 0 9-9 9.8 9.8 0 0 0-6.9 2.9L3 8"/><path d="M3 3v5h5"/>',
+      "rotate-cw": '<path d="M21 12a9 9 0 1 1-9-9 9.8 9.8 0 0 1 6.9 2.9L21 8"/><path d="M21 3v5h-5"/>',
+      "save": '<path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><path d="M17 21v-8H7v8"/><path d="M7 3v5h8"/>',
+      "scale": '<path d="m16 16 3-8 3 8c-.9.7-1.9 1-3 1s-2.1-.3-3-1z"/><path d="m2 16 3-8 3 8c-.9.7-1.9 1-3 1s-2.1-.3-3-1z"/><path d="M7 21h10"/><path d="M12 3v18"/><path d="M3 7h2c2 0 5-2 7-2s5 2 7 2h2"/>',
+      "scan-text": '<path d="M3 7V5a2 2 0 0 1 2-2h2"/><path d="M17 3h2a2 2 0 0 1 2 2v2"/><path d="M21 17v2a2 2 0 0 1-2 2h-2"/><path d="M7 21H5a2 2 0 0 1-2-2v-2"/><path d="M7 8h10"/><path d="M7 12h10"/><path d="M7 16h6"/>',
+      "screen-share": '<rect width="18" height="12" x="3" y="3" rx="2"/><path d="M8 21h8"/><path d="M12 15v6"/><path d="m8 9 4-4 4 4"/><path d="M12 5v7"/>',
+      "shuffle": '<path d="M16 3h5v5"/><path d="M4 20 21 3"/><path d="M21 16v5h-5"/><path d="M15 15l6 6"/><path d="M4 4l5 5"/>',
+      "trash-2": '<path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/>',
+      "undo-2": '<path d="M9 14 4 9l5-5"/><path d="M4 9h10a6 6 0 1 1 0 12h-2"/>',
+      "upload": '<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m17 8-5-5-5 5"/><path d="M12 3v12"/>',
+      "wand-sparkles": '<path d="m21.6 3.6-1.2-1.2a1.2 1.2 0 0 0-1.8 0L2.4 18.6a1.2 1.2 0 0 0 0 1.8l1.2 1.2a1.2 1.2 0 0 0 1.8 0L21.6 5.4a1.2 1.2 0 0 0 0-1.8z"/><path d="m14 7 3 3"/><path d="M5 6v4"/><path d="M19 14v4"/><path d="M10 2v2"/><path d="M7 8H3"/><path d="M21 16h-4"/>',
+      "x": '<path d="M18 6 6 18"/><path d="m6 6 12 12"/>',
+    };
+    const state = {
+      items: [],
+      view: "review",
+      editingId: null,
+      reviewOrder: [],
+      currentImageData: "",
+      currentImageUrl: "",
+      currentImageName: "",
+    };
+
+    const el = {
+      views: {
+        review: document.getElementById("reviewView"),
+        add: document.getElementById("addView"),
+        manage: document.getElementById("manageView"),
+      },
+      navButtons: [...document.querySelectorAll("[data-view-button]")],
+      statTotal: document.getElementById("statTotal"),
+      statWrong: document.getElementById("statWrong"),
+      statMastered: document.getElementById("statMastered"),
+      statSubjects: document.getElementById("statSubjects"),
+      reviewList: document.getElementById("reviewList"),
+      manageList: document.getElementById("manageList"),
+      searchInput: document.getElementById("searchInput"),
+      subjectFilter: document.getElementById("subjectFilter"),
+      subjectCollections: document.getElementById("subjectCollections"),
+      activeCollectionLabel: document.getElementById("activeCollectionLabel"),
+      statusFilter: document.getElementById("statusFilter"),
+      rawText: document.getElementById("rawText"),
+      subjectInput: document.getElementById("subjectInput"),
+      sourceInput: document.getElementById("sourceInput"),
+      questionInput: document.getElementById("questionInput"),
+      optionEditor: document.getElementById("optionEditor"),
+      wrongPicker: document.getElementById("wrongPicker"),
+      noteInput: document.getElementById("noteInput"),
+      previewQuestion: document.getElementById("previewQuestion"),
+      previewWrongOptions: document.getElementById("previewWrongOptions"),
+      previewWrongCount: document.getElementById("previewWrongCount"),
+      ocrProgress: document.getElementById("ocrProgress"),
+      attachmentBox: document.getElementById("attachmentBox"),
+      attachmentPreview: document.getElementById("attachmentPreview"),
+      attachmentTitle: document.getElementById("attachmentTitle"),
+      attachmentHint: document.getElementById("attachmentHint"),
+      formTitle: document.getElementById("formTitle"),
+      toast: document.getElementById("toast"),
+      dialogLayer: document.getElementById("dialogLayer"),
+    };
+
+    function uid() {
+      return crypto.randomUUID ? crypto.randomUUID() : String(Date.now()) + Math.random().toString(16).slice(2);
+    }
+
+    function normalizeLegalPunctuation(text) {
+      return String(text || "")
+        .replace(/\u00a0/g, " ")
+        .replace(/\.{3,}/g, "……")
+        .replace(/,/g, "，")
+        .replace(/;/g, "；")
+        .replace(/:/g, "：")
+        .replace(/\?/g, "？")
+        .replace(/!/g, "！")
+        .replace(/\(/g, "（")
+        .replace(/\)/g, "）")
+        .replace(/\./g, "。");
+    }
+
+    function normalizeText(text) {
+      return (text || "")
+        .normalize("NFKC")
+        .replace(/\u00a0/g, " ")
+        .replace(/[﹒．]/g, ".")
+        .replace(/[﹐]/g, ",")
+        .replace(/[﹕]/g, ":")
+        .replace(/[﹔]/g, ";")
+        .replace(/[？]/g, "?")
+        .replace(/[！]/g, "!")
+        .replace(/[（]/g, "(")
+        .replace(/[）]/g, ")")
+        .replace(/[，]/g, ",")
+        .replace(/[；]/g, ";")
+        .replace(/[：]/g, ":")
+        .replace(/[。]/g, ".")
+        .replace(/[、]/g, "、")
+        .replace(/…+/g, "……")
+        .replace(/[ \t]*\n[ \t]*/g, "\n")
+        .replace(/[ \t]{2,}/g, " ")
+        .replace(/\r/g, "\n")
+        .split("\n")
+        .map(line => normalizeLegalPunctuation(line).trim())
+        .join("\n")
+        .replace(/\r/g, "\n")
+        .replace(/[ \t]+\n/g, "\n")
+        .replace(/\n{3,}/g, "\n\n")
+        .trim();
+    }
+
+    function normalizeOcrText(text) {
+      const cjk = "\\u3400-\\u4dbf\\u4e00-\\u9fff\\uf900-\\ufaff";
+      const cjkRe = new RegExp(`([${cjk}])[ \\t]+([${cjk}])`, "g");
+      const cjkPunctuationLeft = new RegExp(`([${cjk}A-F0-9])[ \\t]+([，。、《》“”‘’；：？！、）】〉])`, "g");
+      const cjkPunctuationRight = new RegExp(`([（【〈《“‘])[ \\t]+([${cjk}A-F0-9])`, "g");
+      const cjkAsciiComma = new RegExp(`([${cjk}])[ \\t]*,[ \\t]*([${cjk}])`, "g");
+      const cjkAsciiPeriod = new RegExp(`([${cjk}])[ \\t]*\\.[ \\t]*([${cjk}])`, "g");
+      let output = (text || "")
+        .normalize("NFKC")
+        .replace(/\u00a0/g, " ")
+        .replace(/[|｜]/g, "I")
+        .replace(/[﹒。．]/g, ".")
+        .replace(/[﹐，]/g, ",")
+        .replace(/[﹕：]/g, ":")
+        .replace(/[﹔；]/g, ";")
+        .replace(/[？]/g, "?")
+        .replace(/[！]/g, "!")
+        .replace(/[（]/g, "(")
+        .replace(/[）]/g, ")")
+        .replace(/\r/g, "\n");
+
+      for (let i = 0; i < 4; i += 1) {
+        output = output.replace(cjkRe, "$1$2");
+      }
+
+      output = output
+        .replace(cjkPunctuationLeft, "$1$2")
+        .replace(cjkPunctuationRight, "$1$2")
+        .replace(cjkAsciiComma, "$1，$2")
+        .replace(cjkAsciiPeriod, "$1。$2")
+        .split("\n")
+        .map(line => normalizeLegalPunctuation(line).trim())
+        .join("\n")
+        .replace(/([A-F])\s*[。．、，）)：：；]\s*/gi, "$1、")
+        .replace(/(^|\n)\s*([A-F])\s+(?=[\u3400-\u9fff])/gi, "$1$2、")
+        .replace(/([^\n])\s+([B-F])、\s*(?=[\u3400-\u9fff])/g, "$1\n$2、")
+        .replace(/[ \t]*([，、；：？！。])[ \t]*/g, "$1")
+        .replace(/[ \t]{2,}/g, " ");
+
+      return normalizeText(output.split("\n").map(line => line.trim()).join("\n"))
+        .replace(/(^|\n)\s*([A-F])\s*[。．、，）)：：；]\s*/gi, "$1$2、");
+    }
+
+    function cleanQuestionText(text) {
+      return mergeOcrLineBreaks(text)
+        .replace(/^[\s【\[]*(单选题|多选题|不定项|判断题|案例题)[\]】\s]*/i, "")
+        .replace(/^\d+[\.\、．]\s*/, "")
+        .replace(/^[,，、。；：:）)]+/, "")
+        .trim();
+    }
+
+    function cleanOptionText(text) {
+      return mergeOcrLineBreaks(text)
+        .replace(/^[A-F]\s*[,，.。、\):：；;）]\s*/i, "")
+        .replace(/^[\s,，、.。；;：:）)]+/, "")
+        .replace(/\s*(正确答案|答案解析|解析|本题解析|我的答案|我的选择|你的答案|您的答案|已选答案|考生答案|错选|错误选项|所选答案)\s*[:：][\s\S]*$/i, "")
+        .replace(/[\s,，、；;：:（(]*$/, "")
+        .trim();
+    }
+
+    function isStopLine(line) {
+      return /^(正确答案|答案解析|解析|本题解析|难度|来源|收藏|笔记|我的答案|我的选择|你的答案|您的答案|已选答案|考生答案|错选|错误选项|所选答案|题型|科目|章节)\s*[:：]/.test(line);
+    }
+
+    function isOptionStart(line) {
+      return /^[A-F]\s*(?:[,，.。、\):：；;）]|(?=[\u3400-\u9fff]))\s*/i.test(line);
+    }
+
+    function joinOcrText(prev, next) {
+      const left = normalizeOcrText(prev).trim();
+      const right = normalizeOcrText(next).trim().replace(/^[,，、.。；;：:）)]+/, "");
+      if (!left) return right;
+      if (!right) return left;
+      if (/-$/.test(left)) return left.slice(0, -1) + right;
+      if (/[A-Za-z0-9]$/.test(left) && /^[A-Za-z0-9]/.test(right)) return `${left} ${right}`;
+      return left + right;
+    }
+
+    function mergeOcrLineBreaks(text) {
+      const lines = normalizeOcrText(text).split("\n").map(line => line.trim()).filter(Boolean);
+      return lines.reduce((merged, line) => joinOcrText(merged, line), "");
+    }
+
+    function parseLetters(value) {
+      if (!value) return [];
+      const half = value
+        .replace(/[Ａ-Ｆ]/g, char => String.fromCharCode(char.charCodeAt(0) - 65248))
+        .toUpperCase();
+      return [...new Set((half.match(/[A-F]/g) || []))];
+    }
+
+    function escapeHtml(value) {
+      return String(value || "").replace(/[&<>"']/g, char => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#39;",
+      }[char]));
+    }
+
+    function renderIcon(name, size = 16) {
+      return `<i data-lucide="${name}" aria-hidden="true" style="width:${size}px;height:${size}px;"></i>`;
+    }
+
+    function renderInlineSvg(name) {
+      const paths = ICON_PATHS[name] || '<circle cx="12" cy="12" r="8"/>';
+      return `<svg viewBox="0 0 24 24" aria-hidden="true">${paths}</svg>`;
+    }
+
+    function formatDate(value) {
+      const date = new Date(value);
+      if (Number.isNaN(date.getTime())) return "";
+      return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+    }
+
+    function isSupabaseConfigured() {
+      const validUrl = /^https:\/\/.+/i.test(APP_CONFIG.supabaseUrl)
+        || /^http:\/\/(?:127\.0\.0\.1|localhost)(?::\d+)?$/i.test(APP_CONFIG.supabaseUrl);
+      return validUrl
+        && APP_CONFIG.supabaseAnonKey.length > 40
+        && !APP_CONFIG.supabaseUrl.includes("YOUR-PROJECT")
+        && !APP_CONFIG.supabaseAnonKey.includes("YOUR_SUPABASE");
+    }
+
+    function requireSupabaseConfig() {
+      if (!isSupabaseConfigured()) {
+        throw new Error("请先在 config.js 填写 Supabase URL 和 anon public key");
+      }
+    }
+
+    function supabaseHeaders(prefer = "") {
+      const headers = {
+        apikey: APP_CONFIG.supabaseAnonKey,
+        Authorization: `Bearer ${APP_CONFIG.supabaseAnonKey}`,
+        "Content-Type": "application/json",
+      };
+      if (prefer) headers.Prefer = prefer;
+      return headers;
+    }
+
+    function supabaseTableUrl(query = "") {
+      return `${APP_CONFIG.supabaseUrl}/rest/v1/${encodeURIComponent(APP_CONFIG.tableName)}${query}`;
+    }
+
+    async function supabaseRequest(query = "", options = {}) {
+      requireSupabaseConfig();
+      const response = await fetch(supabaseTableUrl(query), {
+        method: options.method || "GET",
+        headers: supabaseHeaders(options.prefer || ""),
+        ...(options.body === undefined ? {} : { body: JSON.stringify(options.body) }),
+      });
+      const text = await response.text();
+      let data = null;
+      if (text) {
+        try {
+          data = JSON.parse(text);
+        } catch (error) {
+          data = text;
+        }
+      }
+      if (!response.ok) {
+        const detail = data?.message || data?.details || data?.hint || data || `Supabase 请求失败：${response.status}`;
+        throw new Error(String(detail));
+      }
+      return data;
+    }
+
+    function itemToSupabaseRow(payload) {
+      const item = normalizeItem(payload);
+      const now = new Date().toISOString();
+      return {
+        id: item.id,
+        group_id: APP_CONFIG.groupId,
+        created_at: item.createdAt || now,
+        updated_at: now,
+        subject: item.subject,
+        source: item.source,
+        question: item.question,
+        options: item.options,
+        wrong_letters: item.wrongLetters,
+        note: item.note,
+        raw: item.raw,
+        mastered: item.mastered,
+        reviewed: item.reviewed,
+        image_url: item.imageUrl,
+        image_data: item.imageData,
+        image_name: item.imageName,
+      };
+    }
+
+    async function listSupabaseItems() {
+      const params = new URLSearchParams({
+        select: "*",
+        group_id: `eq.${APP_CONFIG.groupId}`,
+        order: "created_at.desc",
+      });
+      const rows = await supabaseRequest(`?${params.toString()}`);
+      return Array.isArray(rows) ? rows.map(normalizeItem) : [];
+    }
+
+    async function upsertSupabaseItem(payload) {
+      const row = itemToSupabaseRow({
+        ...payload,
+        id: payload.id || uid(),
+        groupId: APP_CONFIG.groupId,
+      });
+      const params = new URLSearchParams({ on_conflict: "id" });
+      const rows = await supabaseRequest(`?${params.toString()}`, {
+        method: "POST",
+        prefer: "resolution=merge-duplicates,return=representation",
+        body: row,
+      });
+      if (!Array.isArray(rows) || !rows[0]) {
+        throw new Error("Supabase 没有返回保存后的题目");
+      }
+      return normalizeItem(rows[0]);
+    }
+
+    async function deleteSupabaseItem(id) {
+      const params = new URLSearchParams({
+        id: `eq.${id}`,
+        group_id: `eq.${APP_CONFIG.groupId}`,
+      });
+      await supabaseRequest(`?${params.toString()}`, {
+        method: "DELETE",
+        prefer: "return=minimal",
+      });
+    }
+
+    async function clearSupabaseItems() {
+      const params = new URLSearchParams({ group_id: `eq.${APP_CONFIG.groupId}` });
+      await supabaseRequest(`?${params.toString()}`, {
+        method: "DELETE",
+        prefer: "return=minimal",
+      });
+    }
+
+    async function importSupabaseItems(items) {
+      const saved = [];
+      for (const item of items) {
+        if (!item || typeof item !== "object") continue;
+        saved.push(await upsertSupabaseItem({
+          ...item,
+          id: item.id || uid(),
+          groupId: APP_CONFIG.groupId,
+        }));
+      }
+      return saved;
+    }
+
+    async function api(path, options = {}) {
+      const method = String(options.method || "GET").toUpperCase();
+      const payload = options.body ? JSON.parse(options.body) : {};
+      if (path === "/api/items" && method === "GET") {
+        return { items: await listSupabaseItems() };
+      }
+      if (path === "/api/items" && method === "POST") {
+        return { item: await upsertSupabaseItem(payload) };
+      }
+      if (path === "/api/items" && method === "DELETE") {
+        await clearSupabaseItems();
+        return { ok: true };
+      }
+      if (path === "/api/import" && method === "POST") {
+        const incoming = Array.isArray(payload.items) ? payload.items : [];
+        const items = await importSupabaseItems(incoming);
+        return { items, count: items.length };
+      }
+      const itemMatch = path.match(/^\/api\/items\/([^/]+)$/);
+      if (itemMatch && method === "PUT") {
+        return { item: await upsertSupabaseItem({ ...payload, id: itemMatch[1] }) };
+      }
+      if (itemMatch && method === "DELETE") {
+        await deleteSupabaseItem(itemMatch[1]);
+        return { ok: true };
+      }
+      throw new Error("不支持的云端数据操作");
+    }
+
+    async function load() {
+      try {
+        const data = await api("/api/items");
+        state.items = Array.isArray(data.items) ? data.items.map(normalizeItem) : [];
+      } catch (error) {
+        console.warn(error);
+        state.items = [];
+        showToast(error.message || "连接 Supabase 共享题库失败");
+      }
+    }
+
+    function normalizeItem(item) {
+      const options = item.options && typeof item.options === "object" ? item.options : {};
+      const wrongLetters = item.wrongLetters ?? item.wrong_letters ?? [];
+      return {
+        id: item.id || uid(),
+        groupId: item.groupId || item.group_id || APP_CONFIG.groupId,
+        createdAt: item.createdAt || item.created_at || new Date().toISOString(),
+        updatedAt: item.updatedAt || item.updated_at || item.createdAt || item.created_at || new Date().toISOString(),
+        subject: normalizeText(item.subject || ""),
+        source: normalizeText(item.source || ""),
+        question: cleanQuestionText(item.question || ""),
+        options: LETTERS.reduce((acc, letter) => {
+          acc[letter] = cleanOptionText(options[letter] || "");
+          return acc;
+        }, {}),
+        wrongLetters: parseLetters(Array.isArray(wrongLetters) ? wrongLetters.join("") : wrongLetters),
+        note: normalizeText(item.note || ""),
+        raw: normalizeOcrText(item.raw || ""),
+        mastered: Boolean(item.mastered),
+        reviewed: Number(item.reviewed || 0),
+        imageUrl: item.imageUrl || item.image_url || "",
+        imageData: item.imageData || item.image_data || "",
+        imageName: item.imageName || item.image_name || "",
+      };
+    }
+
+    function showToast(message) {
+      el.toast.textContent = message;
+      el.toast.classList.add("show");
+      window.clearTimeout(showToast.timer);
+      showToast.timer = window.setTimeout(() => el.toast.classList.remove("show"), 2400);
+    }
+
+    function switchView(view) {
+      state.view = view;
+      Object.entries(el.views).forEach(([key, node]) => node.classList.toggle("hidden", key !== view));
+      el.navButtons.forEach(button => button.classList.toggle("is-active", button.dataset.viewButton === view));
+      if (view === "review") renderReview();
+      if (view === "manage") renderManage();
+      refreshIcons();
+    }
+
+    function refreshIcons() {
+      if (window.lucide?.createIcons) {
+        window.lucide.createIcons();
+        return;
+      }
+      document.querySelectorAll("i[data-lucide]").forEach(node => {
+        node.innerHTML = renderInlineSvg(node.dataset.lucide);
+      });
+    }
+
+    function renderOptionInputs() {
+      el.optionEditor.innerHTML = LETTERS.map(letter => `
+        <div class="option-row">
+          <div class="letter">${letter}</div>
+          <input id="option${letter}" data-option="${letter}" placeholder="${letter} 选项内容">
+        </div>
+      `).join("");
+
+      el.wrongPicker.innerHTML = LETTERS.map(letter => `
+        <label title="错选 ${letter}">
+          <input type="checkbox" value="${letter}">
+          ${letter}
+        </label>
+      `).join("");
+
+      [...el.optionEditor.querySelectorAll("input"), ...el.wrongPicker.querySelectorAll("input")].forEach(input => {
+        input.addEventListener("input", updatePreview);
+        input.addEventListener("change", updatePreview);
+      });
+    }
+
+    function getFormData() {
+      const options = {};
+      LETTERS.forEach(letter => {
+        const input = el.optionEditor.querySelector(`[data-option="${letter}"]`);
+        options[letter] = input ? cleanOptionText(input.value) : "";
+      });
+      const wrongLetters = [...el.wrongPicker.querySelectorAll("input:checked")].map(input => input.value);
+      return {
+        subject: normalizeText(el.subjectInput.value),
+        source: normalizeText(el.sourceInput.value),
+        question: cleanQuestionText(el.questionInput.value),
+        options,
+        wrongLetters,
+        note: normalizeText(el.noteInput.value),
+        raw: normalizeOcrText(el.rawText.value),
+        imageUrl: state.currentImageUrl,
+        imageData: state.currentImageData,
+        imageName: state.currentImageName,
+      };
+    }
+
+    function setFormData(data, preserveAttachment = false) {
+      el.subjectInput.value = data.subject || "";
+      el.sourceInput.value = data.source || "";
+      el.questionInput.value = data.question || "";
+      el.noteInput.value = data.note || "";
+      el.rawText.value = data.raw || "";
+      LETTERS.forEach(letter => {
+        const input = el.optionEditor.querySelector(`[data-option="${letter}"]`);
+        if (input) input.value = data.options?.[letter] || "";
+      });
+      const wrongSet = new Set(data.wrongLetters || []);
+      el.wrongPicker.querySelectorAll("input").forEach(input => {
+        input.checked = wrongSet.has(input.value);
+      });
+      if (!preserveAttachment) {
+        state.currentImageData = data.imageData || "";
+        state.currentImageUrl = data.imageUrl || "";
+        state.currentImageName = data.imageName || (state.currentImageData || state.currentImageUrl ? "已保存原图" : "");
+      }
+      updateAttachmentPreview();
+      updatePreview();
+    }
+
+    function resetForm() {
+      state.editingId = null;
+      el.formTitle.textContent = "录入错题";
+      setFormData({
+        subject: "",
+        source: "",
+        question: "",
+        options: {},
+        wrongLetters: [],
+        note: "",
+        raw: "",
+        imageUrl: "",
+        imageData: "",
+        imageName: "",
+      });
+    }
+
+    function updateAttachmentPreview() {
+      const source = state.currentImageData || state.currentImageUrl;
+      el.attachmentBox.classList.toggle("hidden", !source);
+      if (!source) {
+        el.attachmentPreview.removeAttribute("src");
+        return;
+      }
+      el.attachmentPreview.src = source;
+      el.attachmentTitle.textContent = state.currentImageName || "已附加截图";
+      el.attachmentHint.textContent = state.currentImageData
+        ? "保存后会上传到共享题库。"
+        : "这张图已保存在共享题库。";
+    }
+
+    function fileToDataUrl(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = () => reject(reader.error);
+        reader.readAsDataURL(file);
+      });
+    }
+
+    function clearAttachedImage() {
+      state.currentImageData = "";
+      state.currentImageUrl = "";
+      state.currentImageName = "";
+      updateAttachmentPreview();
+      showToast("已移除本题截图");
+    }
+
+    function updatePreview() {
+      const data = getFormData();
+      el.previewQuestion.textContent = data.question || "题干会显示在这里。";
+      el.previewWrongCount.textContent = `${data.wrongLetters.length} 个错选`;
+      el.previewWrongOptions.innerHTML = data.wrongLetters.length
+        ? data.wrongLetters.map(letter => {
+          const optionText = data.options[letter] || "待填写选项内容";
+          return `<div class="wrong-option"><strong>${letter}</strong><span>${escapeHtml(optionText)}</span></div>`;
+        }).join("")
+        : `<div class="wrong-option"><strong>?</strong><span>选择你当时错选的选项</span></div>`;
+      refreshIcons();
+    }
+
+    function parseCopiedText(raw) {
+      const text = normalizeOcrText(raw);
+      if (!text) return null;
+
+      const result = {
+        question: "",
+        options: {},
+        wrongLetters: [],
+        subject: "",
+        source: "竹马刷题",
+        note: "",
+        raw: text,
+      };
+
+      const cleanedForSubject = text.match(/(?:科目|章节|考点)[：:\s]+([^\n]+)/);
+      if (cleanedForSubject) result.subject = normalizeText(cleanedForSubject[1]).slice(0, 24);
+
+      const answerPatterns = [
+        /(?:我的答案|我的选择|你的答案|您的答案|您选择|已选答案|考生答案|用户答案|错选|错误选项|所选答案)[：:\s]*([A-FＡ-Ｆ、,，\s]+)/i,
+        /(?:本题你选|你选择了|您选了|你选了)[：:\s]*([A-FＡ-Ｆ、,，\s]+)/i,
+      ];
+
+      for (const pattern of answerPatterns) {
+        const match = text.match(pattern);
+        if (match) {
+          result.wrongLetters = parseLetters(match[1]);
+          break;
+        }
+      }
+
+      const optionReadyText = text
+        .replace(/([^\n])\s+([B-F])\s*[,，.。、\):：；;）]\s*(?=[\u3400-\u9fffA-Za-z0-9])/g, "$1\n$2、")
+        .replace(/([。；])\s*([B-F])\s+(?=[\u3400-\u9fff])/g, "$1\n$2、");
+      const lines = optionReadyText.split("\n").map(line => line.trim()).filter(Boolean);
+      let currentLetter = "";
+      let sawOption = false;
+      const questionLines = [];
+
+      for (const line of lines) {
+        if (isStopLine(line)) continue;
+
+        const optionMatch = line.match(/^([A-F])\s*(?:[,，.。、\):：；;）]|(?=[\u3400-\u9fff]))\s*(.*)$/i);
+        if (optionMatch) {
+          currentLetter = parseLetters(optionMatch[1])[0];
+          sawOption = true;
+          result.options[currentLetter] = cleanOptionText(optionMatch[2]);
+          continue;
+        }
+
+        const inlineOption = line.match(/^([A-F])\s+(.{2,})$/i);
+        if (inlineOption) {
+          currentLetter = parseLetters(inlineOption[1])[0];
+          sawOption = true;
+          result.options[currentLetter] = cleanOptionText(inlineOption[2]);
+          continue;
+        }
+
+        if (currentLetter && !line.match(/^\d+[\.\、．]/)) {
+          result.options[currentLetter] = cleanOptionText(joinOcrText(result.options[currentLetter] || "", line));
+        } else if (!sawOption) {
+          questionLines.push(line);
+        }
+      }
+
+      if (!Object.keys(result.options).length) {
+        const optionRegex = /(?:^|\n)\s*([A-F])\s*(?:[,，.。、\):：；;）]|(?=[\u3400-\u9fff]))\s*([\s\S]*?)(?=\n\s*[A-F]\s*(?:[,，.。、\):：；;）]|(?=[\u3400-\u9fff]))|\n\s*(?:正确答案|答案解析|解析|我的答案|我的选择|你的答案|您的答案|已选答案|所选答案|$))/gi;
+        let match;
+        while ((match = optionRegex.exec(optionReadyText))) {
+          const letter = parseLetters(match[1])[0];
+          result.options[letter] = cleanOptionText(match[2]);
+        }
+      }
+
+      const firstOptionIndex = searchFirstOptionIndex(optionReadyText);
+      const questionSource = firstOptionIndex > 0 ? optionReadyText.slice(0, firstOptionIndex) : questionLines.join("\n");
+      result.question = cleanQuestionText(
+        questionSource
+          .replace(/(?:科目|章节|考点|题型)[：:].*/g, "")
+          .replace(answerPatterns[0], "")
+          .replace(answerPatterns[1], "")
+      );
+
+      if (!result.question && questionLines.length) {
+        result.question = cleanQuestionText(questionLines.reduce((merged, line) => joinOcrText(merged, line), ""));
+      }
+
+      LETTERS.forEach(letter => {
+        if (!result.options[letter]) result.options[letter] = "";
+      });
+
+      return result;
+    }
+
+    function searchFirstOptionIndex(text) {
+      const match = text.match(/(?:^|\n)\s*[A-F]\s*(?:[,，.。、\):：；;）]|(?=[\u3400-\u9fff]))\s*/i);
+      return match ? match.index + (match[0].startsWith("\n") ? 1 : 0) : -1;
+    }
+
+    function handleParse() {
+      const parsed = parseCopiedText(el.rawText.value);
+      if (!parsed) {
+        showToast("先粘贴题目原文");
+        return;
+      }
+      const current = getFormData();
+      setFormData({
+        ...current,
+        ...parsed,
+        subject: parsed.subject || current.subject,
+        source: current.source || parsed.source,
+        note: current.note,
+      }, true);
+      showToast("已提取，可再手动调整");
+    }
+
+    function updateOcrProgress(label, value = 0) {
+      el.ocrProgress.innerHTML = `
+        <div class="progress-bar" aria-hidden="true"><span style="--value: ${value}%"></span></div>
+        <span>${label}</span>
+      `;
+    }
+
+    async function preprocessImageForOcr(file) {
+      if (!("createImageBitmap" in window)) return file;
+      const bitmap = await createImageBitmap(file);
+      try {
+        const scale = Math.min(2.4, Math.max(1.25, 1800 / Math.max(bitmap.width, 1)));
+        const width = Math.min(3400, Math.round(bitmap.width * scale));
+        const height = Math.min(4200, Math.round(bitmap.height * scale));
+        const canvas = document.createElement("canvas");
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext("2d", { willReadFrequently: true });
+        ctx.fillStyle = "#fff";
+        ctx.fillRect(0, 0, width, height);
+        ctx.imageSmoothingEnabled = true;
+        ctx.imageSmoothingQuality = "high";
+        ctx.drawImage(bitmap, 0, 0, width, height);
+
+        const imageData = ctx.getImageData(0, 0, width, height);
+        const data = imageData.data;
+        for (let i = 0; i < data.length; i += 4) {
+          let gray = data[i] * 0.299 + data[i + 1] * 0.587 + data[i + 2] * 0.114;
+          gray = (gray - 128) * 1.34 + 128;
+          if (gray > 238) gray = 255;
+          if (gray < 52) gray = 0;
+          gray = Math.max(0, Math.min(255, gray));
+          data[i] = gray;
+          data[i + 1] = gray;
+          data[i + 2] = gray;
+          data[i + 3] = 255;
+        }
+        ctx.putImageData(imageData, 0, 0);
+
+        const blob = await new Promise(resolve => canvas.toBlob(resolve, "image/png"));
+        return blob ? new File([blob], `ocr-${Date.now()}.png`, { type: "image/png" }) : file;
+      } finally {
+        if (bitmap.close) bitmap.close();
+      }
+    }
+
+    async function recognizeWithNativeTextDetector(file) {
+      if (!("TextDetector" in window) || !("createImageBitmap" in window)) return "";
+      const bitmap = await createImageBitmap(file);
+      try {
+        const detector = new TextDetector();
+        const results = await detector.detect(bitmap);
+        return normalizeOcrText(results.map(item => item.rawValue).join("\n"));
+      } finally {
+        if (bitmap.close) bitmap.close();
+      }
+    }
+
+    async function ensureTesseractLoaded() {
+      if (window.Tesseract) return true;
+      if (!window.__tesseractLoadPromise) {
+        window.__tesseractLoadPromise = fetch("./vendor/tesseract/tesseract.min.js")
+          .then(response => {
+            if (!response.ok) throw new Error("OCR script unavailable");
+            return response.text();
+          })
+          .then(source => {
+            new Function("self", source)(window);
+            return Boolean(window.Tesseract);
+          })
+          .catch(error => {
+            console.error(error);
+            return false;
+          });
+      }
+      return window.__tesseractLoadPromise;
+    }
+
+    function isUsableOcrText(text) {
+      const compact = normalizeText(text).replace(/\s/g, "");
+      return compact.length >= 8;
+    }
+
+    async function runTesseractAttempt(file, mode) {
+      const ready = await ensureTesseractLoaded();
+      if (!ready) return "";
+      const label = mode.label || "识别";
+      const worker = await Tesseract.createWorker("chi_sim+eng", 1, {
+        workerPath: "./vendor/tesseract/worker.min.js",
+        corePath: "./vendor/tesseract",
+        ...(mode.langPath ? { langPath: mode.langPath } : {}),
+        ...(mode.cacheMethod ? { cacheMethod: mode.cacheMethod } : {}),
+        ...(typeof mode.lstmOnly === "boolean" ? { lstmOnly: mode.lstmOnly } : {}),
+        gzip: true,
+        logger: message => {
+          if (message.status === "recognizing text") {
+            updateOcrProgress(`${label} ${Math.round((message.progress || 0) * 100)}%`, Math.round((message.progress || 0) * 100));
+          } else if (message.status) {
+            updateOcrProgress(label, 8);
+          }
+        },
+      });
+      try {
+        if (worker.setParameters) {
+          await worker.setParameters({
+            preserve_interword_spaces: "0",
+            tessedit_pageseg_mode: Tesseract.PSM?.SINGLE_BLOCK || "6",
+            user_defined_dpi: "300",
+          });
+        }
+        const result = await worker.recognize(file);
+        return normalizeOcrText(result.data.text);
+      } finally {
+        await worker.terminate();
+      }
+    }
+
+    async function recognizeWithTesseract(file) {
+      const prepared = await preprocessImageForOcr(file);
+      const attempts = [
+        { label: "高精度识别", cacheMethod: "write", lstmOnly: false },
+        { label: "快速识别", langPath: "./vendor/tesseract/lang-fast", cacheMethod: "none", lstmOnly: true },
+      ];
+
+      for (const attempt of attempts) {
+        try {
+          const text = await runTesseractAttempt(prepared, attempt);
+          if (isUsableOcrText(text)) return text;
+        } catch (error) {
+          console.error(error);
+        }
+      }
+
+      return "";
+    }
+
+    async function handleImageUpload(file, name = "") {
+      if (!file) return;
+
+      try {
+        state.currentImageData = await fileToDataUrl(file);
+        state.currentImageUrl = "";
+        state.currentImageName = name || file.name || "已附加截图";
+        updateAttachmentPreview();
+        updateOcrProgress("OCR 识别中", 3);
+        let text = await recognizeWithTesseract(file);
+        if (!text) text = await recognizeWithNativeTextDetector(file);
+        if (!text) {
+          showToast("截图已附加，但当前浏览器没有识别出文字");
+          return;
+        }
+        el.rawText.value = text;
+        handleParse();
+        showToast("截图已识别");
+      } catch (error) {
+        console.error(error);
+        showToast("识别失败，可以换清晰截图或直接粘贴文字");
+      } finally {
+        window.setTimeout(() => {
+          el.ocrProgress.innerHTML = "";
+        }, 900);
+      }
+    }
+
+    async function captureWindowImage() {
+      if (!navigator.mediaDevices?.getDisplayMedia) {
+        showToast("当前浏览器不支持直接截取窗口，可使用上传图片");
+        return;
+      }
+      let stream;
+      try {
+        showToast("请选择竹马窗口或当前标签页");
+        stream = await navigator.mediaDevices.getDisplayMedia({
+          video: { displaySurface: "window" },
+          audio: false,
+        });
+        const video = document.createElement("video");
+        video.srcObject = stream;
+        video.muted = true;
+        await new Promise(resolve => {
+          video.onloadedmetadata = resolve;
+        });
+        await video.play();
+        const canvas = document.createElement("canvas");
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        canvas.getContext("2d").drawImage(video, 0, 0);
+        const dataUrl = canvas.toDataURL("image/png");
+        stream.getTracks().forEach(track => track.stop());
+        stream = null;
+        const file = await openCropDialog(dataUrl, "窗口截图");
+        if (file) await handleImageUpload(file, "框选截图");
+      } catch (error) {
+        console.error(error);
+        showToast("没有完成窗口截取");
+      } finally {
+        if (stream) stream.getTracks().forEach(track => track.stop());
+      }
+    }
+
+    function openCropDialog(dataUrl, name) {
+      return new Promise(resolve => {
+        let selection = { x: 0, y: 0, w: 0, h: 0 };
+        let dragging = false;
+        let start = { x: 0, y: 0 };
+
+        el.dialogLayer.innerHTML = `
+          <div class="dialog crop-dialog">
+            <div class="panel-head">
+              <h3>框选题目范围</h3>
+              <button class="icon-button" data-crop-cancel aria-label="关闭">${renderIcon("x", 18)}</button>
+            </div>
+            <div class="panel-body">
+              <div class="crop-frame" id="cropFrame">
+                <img id="cropImage" alt="待裁剪截图">
+                <div class="crop-selection" id="cropSelection"></div>
+              </div>
+              <p class="crop-hint">拖拽框选题干、选项和“我的答案”所在区域，尽量避开导航栏、广告和解析内容。</p>
+              <div class="button-row" style="justify-content:flex-end;">
+                <button class="ghost-button" data-crop-full>使用整张</button>
+                <button class="ghost-button" data-crop-cancel>取消</button>
+                <button class="primary-button" data-crop-confirm>${renderIcon("scan-text", 15)}识别所选范围</button>
+              </div>
+            </div>
+          </div>
+        `;
+        el.dialogLayer.classList.remove("hidden");
+        el.dialogLayer.dataset.locked = "true";
+        refreshIcons();
+
+        const image = el.dialogLayer.querySelector("#cropImage");
+        const frame = el.dialogLayer.querySelector("#cropFrame");
+        const box = el.dialogLayer.querySelector("#cropSelection");
+
+        function clamp(value, min, max) {
+          return Math.min(Math.max(value, min), max);
+        }
+
+        function framePoint(event) {
+          const rect = frame.getBoundingClientRect();
+          return {
+            x: clamp(event.clientX - rect.left, 0, rect.width),
+            y: clamp(event.clientY - rect.top, 0, rect.height),
+          };
+        }
+
+        function drawSelection() {
+          box.style.left = `${selection.x}px`;
+          box.style.top = `${selection.y}px`;
+          box.style.width = `${selection.w}px`;
+          box.style.height = `${selection.h}px`;
+        }
+
+        function setDefaultSelection() {
+          const rect = image.getBoundingClientRect();
+          selection = {
+            x: Math.round(rect.width * 0.08),
+            y: Math.round(rect.height * 0.10),
+            w: Math.round(rect.width * 0.84),
+            h: Math.round(rect.height * 0.70),
+          };
+          drawSelection();
+        }
+
+        function cropToFile(useFull = false) {
+          const imageRect = image.getBoundingClientRect();
+          const selected = useFull
+            ? { x: 0, y: 0, w: imageRect.width, h: imageRect.height }
+            : selection;
+          const scaleX = image.naturalWidth / imageRect.width;
+          const scaleY = image.naturalHeight / imageRect.height;
+          const sx = Math.round(selected.x * scaleX);
+          const sy = Math.round(selected.y * scaleY);
+          const sw = Math.max(1, Math.round(selected.w * scaleX));
+          const sh = Math.max(1, Math.round(selected.h * scaleY));
+          const canvas = document.createElement("canvas");
+          canvas.width = sw;
+          canvas.height = sh;
+          canvas.getContext("2d").drawImage(image, sx, sy, sw, sh, 0, 0, sw, sh);
+          return new Promise(fileResolve => {
+            canvas.toBlob(blob => {
+              if (!blob) {
+                fileResolve(null);
+                return;
+              }
+              fileResolve(new File([blob], `${name}-${Date.now()}.png`, { type: "image/png" }));
+            }, "image/png");
+          });
+        }
+
+        function finish(file) {
+          delete el.dialogLayer.dataset.locked;
+          closeDialog();
+          resolve(file);
+        }
+
+        frame.addEventListener("pointerdown", event => {
+          event.preventDefault();
+          dragging = true;
+          start = framePoint(event);
+          selection = { x: start.x, y: start.y, w: 1, h: 1 };
+          frame.setPointerCapture(event.pointerId);
+          drawSelection();
+        });
+
+        frame.addEventListener("pointermove", event => {
+          if (!dragging) return;
+          const point = framePoint(event);
+          selection = {
+            x: Math.min(start.x, point.x),
+            y: Math.min(start.y, point.y),
+            w: Math.abs(point.x - start.x),
+            h: Math.abs(point.y - start.y),
+          };
+          drawSelection();
+        });
+
+        frame.addEventListener("pointerup", event => {
+          dragging = false;
+          frame.releasePointerCapture(event.pointerId);
+        });
+
+        el.dialogLayer.querySelectorAll("[data-crop-cancel]").forEach(button => {
+          button.addEventListener("click", () => finish(null));
+        });
+        el.dialogLayer.querySelector("[data-crop-full]").addEventListener("click", async () => {
+          finish(await cropToFile(true));
+        });
+        el.dialogLayer.querySelector("[data-crop-confirm]").addEventListener("click", async () => {
+          if (selection.w < 20 || selection.h < 20) {
+            showToast("请先框选题目区域");
+            return;
+          }
+          finish(await cropToFile(false));
+        });
+
+        image.addEventListener("load", setDefaultSelection);
+        image.src = dataUrl;
+      });
+    }
+
+    function validateItem(data) {
+      if (!data.question) return "题目还没填";
+      if (!data.wrongLetters.length) return "请选择当时错选的选项";
+      const missing = data.wrongLetters.filter(letter => !data.options[letter]);
+      if (missing.length) return `错选 ${missing.join("、")} 的内容还没填`;
+      return "";
+    }
+
+    async function handleSave() {
+      const data = getFormData();
+      const error = validateItem(data);
+      if (error) {
+        showToast(error);
+        return;
+      }
+
+      const existing = state.items.find(item => item.id === state.editingId);
+      const wasEditing = Boolean(state.editingId);
+      const payload = {
+        ...(existing || {}),
+        ...data,
+        imageData: state.currentImageData,
+      };
+
+      try {
+        const result = wasEditing
+          ? await api(`/api/items/${state.editingId}`, { method: "PUT", body: JSON.stringify(payload) })
+          : await api("/api/items", { method: "POST", body: JSON.stringify(payload) });
+        const saved = normalizeItem(result.item);
+        const index = state.items.findIndex(item => item.id === saved.id);
+        if (index >= 0) state.items[index] = saved;
+        else state.items.unshift(saved);
+        refreshAll();
+        resetForm();
+        switchView("review");
+        showToast(wasEditing ? "已更新到共享题库" : "已保存到共享题库");
+      } catch (error) {
+        console.error(error);
+        showToast(error.message || "保存到 Supabase 失败");
+      }
+    }
+
+    function allSubjects() {
+      return [...new Set([...DEFAULT_SUBJECTS, ...state.items.map(item => item.subject).filter(Boolean)])];
+    }
+
+    function subjectNotebookStats() {
+      const bySubject = new Map();
+      state.items.forEach(item => {
+        const key = item.subject || "__none__";
+        const label = item.subject || "未分类";
+        if (!bySubject.has(key)) {
+          bySubject.set(key, { key, label, total: 0, active: 0, mastered: 0, wrong: 0 });
+        }
+        const stat = bySubject.get(key);
+        stat.total += 1;
+        stat.wrong += item.wrongLetters.length;
+        if (item.mastered) stat.mastered += 1;
+        else stat.active += 1;
+      });
+
+      const order = new Map(DEFAULT_SUBJECTS.map((subject, index) => [subject, index]));
+      const rank = stat => {
+        if (stat.key === "__none__") return 999;
+        return order.has(stat.label) ? order.get(stat.label) : 100;
+      };
+      return [...bySubject.values()].sort((a, b) => {
+        return rank(a) - rank(b) || a.label.localeCompare(b.label, "zh-Hans-CN");
+      });
+    }
+
+    function renderSubjectCollections() {
+      const selected = el.subjectFilter.value;
+      const stats = subjectNotebookStats();
+      const totalWrong = state.items.reduce((sum, item) => sum + item.wrongLetters.length, 0);
+      const totalActive = state.items.filter(item => !item.mastered).length;
+      const allButton = {
+        key: "",
+        label: "全部错题",
+        total: state.items.length,
+        active: totalActive,
+        wrong: totalWrong,
+      };
+      const buttons = [allButton, ...stats];
+      el.subjectCollections.innerHTML = buttons.map(stat => `
+        <button class="collection-button ${selected === stat.key ? "is-active" : ""}" data-subject-key="${escapeHtml(stat.key)}">
+          <strong>${escapeHtml(stat.label)}</strong>
+          <span>${stat.total} 题 · 未掌握 ${stat.active} · 错选 ${stat.wrong}</span>
+        </button>
+      `).join("");
+      const selectedStat = buttons.find(stat => stat.key === selected) || allButton;
+      el.activeCollectionLabel.textContent = selectedStat.label;
+      el.subjectCollections.querySelectorAll("[data-subject-key]").forEach(button => {
+        button.addEventListener("click", () => {
+          el.subjectFilter.value = button.dataset.subjectKey;
+          state.reviewOrder = [];
+          renderReview();
+        });
+      });
+      refreshIcons();
+    }
+
+    function refreshSubjectFilter() {
+      const current = el.subjectFilter.value;
+      const hasUnclassified = state.items.some(item => !item.subject);
+      el.subjectFilter.innerHTML = `<option value="">全部科目</option>` +
+        (hasUnclassified ? `<option value="__none__">未分类</option>` : "") + allSubjects()
+        .map(subject => `<option value="${escapeHtml(subject)}">${escapeHtml(subject)}</option>`)
+        .join("");
+      el.subjectFilter.value = current === "__none__" && hasUnclassified || allSubjects().includes(current) ? current : "";
+    }
+
+    function filteredItems() {
+      const q = normalizeText(el.searchInput.value).toLowerCase();
+      const subject = el.subjectFilter.value;
+      const status = el.statusFilter.value;
+
+      return state.items.filter(item => {
+        if (subject === "__none__" && item.subject) return false;
+        if (subject && subject !== "__none__" && item.subject !== subject) return false;
+        if (status === "active" && item.mastered) return false;
+        if (status === "mastered" && !item.mastered) return false;
+        if (!q) return true;
+        const wrongText = item.wrongLetters.map(letter => `${letter} ${item.options[letter] || ""}`).join(" ");
+        return [item.question, wrongText, item.note, item.subject, item.source].join(" ").toLowerCase().includes(q);
+      });
+    }
+
+    function renderReview() {
+      renderSubjectCollections();
+      const items = orderedReviewItems(filteredItems());
+      if (!items.length) {
+        el.reviewList.innerHTML = emptyState("book-open-check", "还没有可复习的错选", "到录入页粘贴一道题，保存后这里就只显示题干和错选。");
+        refreshIcons();
+        return;
+      }
+      el.reviewList.innerHTML = items.map(item => questionCard(item, "review")).join("");
+      bindCardActions(el.reviewList);
+      refreshIcons();
+    }
+
+    function orderedReviewItems(items) {
+      if (!state.reviewOrder.length) return items;
+      const order = new Map(state.reviewOrder.map((id, index) => [id, index]));
+      return [...items].sort((a, b) => (order.get(a.id) ?? 99999) - (order.get(b.id) ?? 99999));
+    }
+
+    function renderManage() {
+      const items = [...state.items];
+      if (!items.length) {
+        el.manageList.innerHTML = emptyState("database", "错题库为空", "保存过的题目会出现在这里。");
+        refreshIcons();
+        return;
+      }
+      el.manageList.innerHTML = items.map(item => questionCard(item, "manage")).join("");
+      bindCardActions(el.manageList);
+      refreshIcons();
+    }
+
+    function questionCard(item, mode) {
+      const sourceImage = item.imageData || item.imageUrl;
+      const wrongOptions = item.wrongLetters.map(letter => `
+        <div class="wrong-option"><strong>${letter}</strong><span>${escapeHtml(item.options[letter] || "")}</span></div>
+      `).join("");
+      const meta = [
+        item.subject ? `<span class="pill">${renderIcon("book-marked", 13)}${escapeHtml(item.subject)}</span>` : "",
+        item.source ? `<span class="pill">${renderIcon("map-pin", 13)}${escapeHtml(item.source)}</span>` : "",
+        `<span class="pill">${formatDate(item.createdAt)}</span>`,
+        item.mastered ? `<span class="pill is-mastered">${renderIcon("check", 13)}已掌握</span>` : "",
+        sourceImage ? `<span class="pill">${renderIcon("image-up", 13)}原图</span>` : "",
+        `<span class="pill is-wrong">${item.wrongLetters.join("、")}</span>`,
+      ].filter(Boolean).join("");
+      const manageExtras = mode === "manage"
+        ? `${sourceImage ? `<img class="source-image" src="${escapeHtml(sourceImage)}" alt="错题原图" style="max-width:420px;">` : ""}
+          <div class="full-options">${LETTERS.filter(letter => item.options[letter]).map(letter => `
+            <div class="full-option ${item.wrongLetters.includes(letter) ? "is-picked" : ""}">
+              <strong>${letter}</strong><span>${escapeHtml(item.options[letter])}</span>
+            </div>
+          `).join("")}</div>
+          ${item.note ? `<p class="question-text" style="font-size:14px;color:var(--muted);">${escapeHtml(item.note)}</p>` : ""}`
+        : "";
+
+      return `
+        <article class="question-card" data-id="${item.id}">
+          <div class="question-main">
+            <div class="card-meta">${meta}</div>
+            <p class="question-text">${escapeHtml(item.question)}</p>
+            <div class="wrong-options">${wrongOptions}</div>
+            ${manageExtras}
+          </div>
+          <div class="card-actions">
+            <button class="ghost-button" data-action="reviewed">${renderIcon("rotate-cw", 15)}看过</button>
+            ${mode === "review" ? `<button class="ghost-button" data-action="all-options">${renderIcon("list-checks", 15)}全部选项</button>` : ""}
+            <button class="soft-button" data-action="mastered">${renderIcon(item.mastered ? "undo-2" : "check-check", 15)}${item.mastered ? "取消掌握" : "掌握"}</button>
+            <button class="ghost-button" data-action="edit">${renderIcon("pencil", 15)}编辑</button>
+            <button class="danger-button" data-action="delete">${renderIcon("trash-2", 15)}删除</button>
+          </div>
+        </article>
+      `;
+    }
+
+    function emptyState(icon, title, body) {
+      return `
+        <div class="empty">
+          <div>
+            <span class="empty-icon">${renderIcon(icon, 30)}</span>
+            <h3>${escapeHtml(title)}</h3>
+            <p>${escapeHtml(body)}</p>
+          </div>
+        </div>
+      `;
+    }
+
+    function bindCardActions(container) {
+      container.querySelectorAll("[data-action]").forEach(button => {
+        button.addEventListener("click", () => {
+          const card = button.closest("[data-id]");
+          const item = state.items.find(entry => entry.id === card.dataset.id);
+          if (!item) return;
+          const action = button.dataset.action;
+          if (action === "edit") editItem(item.id);
+          if (action === "delete") deleteItem(item.id);
+          if (action === "mastered") toggleMastered(item.id);
+          if (action === "reviewed") markReviewed(item.id);
+          if (action === "all-options") openAllOptions(item.id);
+        });
+      });
+    }
+
+    function openAllOptions(id) {
+      const item = state.items.find(entry => entry.id === id);
+      if (!item) return;
+      const optionLetters = LETTERS.filter(letter => item.options[letter]);
+      const optionsHtml = optionLetters.length
+        ? optionLetters.map(letter => `
+            <div class="full-option ${item.wrongLetters.includes(letter) ? "is-picked" : ""}">
+              <strong>${letter}</strong><span>${escapeHtml(item.options[letter])}</span>
+            </div>
+          `).join("")
+        : `<p class="question-text" style="font-size:15px;color:var(--muted);">这道题还没有保存选项内容。</p>`;
+
+      el.dialogLayer.innerHTML = `
+        <div class="dialog">
+          <div class="panel-head">
+            <h3>全部选项</h3>
+            <button class="icon-button" data-dialog-close aria-label="关闭">${renderIcon("x", 18)}</button>
+          </div>
+          <div class="panel-body">
+            <p class="question-text" style="font-size:15px;">${escapeHtml(item.question || "未填写题干")}</p>
+            <div class="full-options">${optionsHtml}</div>
+            <div class="button-row" style="justify-content:flex-end;margin-top:14px;">
+              <button class="ghost-button" data-dialog-close>关闭</button>
+            </div>
+          </div>
+        </div>
+      `;
+      el.dialogLayer.classList.remove("hidden");
+      el.dialogLayer.querySelectorAll("[data-dialog-close]").forEach(button => {
+        button.addEventListener("click", closeDialog);
+      });
+      refreshIcons();
+    }
+
+    function editItem(id) {
+      const item = state.items.find(entry => entry.id === id);
+      if (!item) return;
+      state.editingId = id;
+      el.formTitle.textContent = "编辑错题";
+      setFormData(item);
+      switchView("add");
+    }
+
+    function deleteItem(id) {
+      openConfirm("删除这道错题？", "删除后不会再出现在共享题库。", async () => {
+        try {
+          await api(`/api/items/${id}`, { method: "DELETE" });
+          state.items = state.items.filter(item => item.id !== id);
+          refreshAll();
+          showToast("已删除");
+        } catch (error) {
+          console.error(error);
+          showToast(error.message || "从 Supabase 删除失败");
+        }
+      });
+    }
+
+    async function toggleMastered(id) {
+      const item = state.items.find(entry => entry.id === id);
+      if (!item) return;
+      const next = { ...item, mastered: !item.mastered };
+      try {
+        const result = await api(`/api/items/${id}`, { method: "PUT", body: JSON.stringify(next) });
+        const saved = normalizeItem(result.item);
+        state.items[state.items.findIndex(entry => entry.id === id)] = saved;
+        refreshAll();
+        showToast(saved.mastered ? "已标记掌握" : "已恢复复习");
+      } catch (error) {
+        console.error(error);
+        showToast(error.message || "更新 Supabase 失败");
+      }
+    }
+
+    async function markReviewed(id) {
+      const item = state.items.find(entry => entry.id === id);
+      if (!item) return;
+      const next = { ...item, reviewed: item.reviewed + 1 };
+      try {
+        const result = await api(`/api/items/${id}`, { method: "PUT", body: JSON.stringify(next) });
+        const saved = normalizeItem(result.item);
+        state.items[state.items.findIndex(entry => entry.id === id)] = saved;
+        refreshAll();
+        showToast("已记录一次复习");
+      } catch (error) {
+        console.error(error);
+        showToast(error.message || "记录到 Supabase 失败");
+      }
+    }
+
+    function openConfirm(title, body, onConfirm) {
+      el.dialogLayer.innerHTML = `
+        <div class="dialog">
+          <div class="panel-head">
+            <h3>${escapeHtml(title)}</h3>
+            <button class="icon-button" data-dialog-close aria-label="关闭">${renderIcon("x", 18)}</button>
+          </div>
+          <div class="panel-body">
+            <p class="question-text" style="font-size:15px;">${escapeHtml(body)}</p>
+            <div class="button-row" style="justify-content:flex-end;">
+              <button class="ghost-button" data-dialog-close>取消</button>
+              <button class="danger-button" data-dialog-confirm>确认</button>
+            </div>
+          </div>
+        </div>
+      `;
+      el.dialogLayer.classList.remove("hidden");
+      el.dialogLayer.querySelectorAll("[data-dialog-close]").forEach(button => {
+        button.addEventListener("click", closeDialog);
+      });
+      el.dialogLayer.querySelector("[data-dialog-confirm]").addEventListener("click", () => {
+        closeDialog();
+        onConfirm();
+      });
+      refreshIcons();
+    }
+
+    function closeDialog() {
+      el.dialogLayer.classList.add("hidden");
+      el.dialogLayer.innerHTML = "";
+      delete el.dialogLayer.dataset.locked;
+    }
+
+    function refreshStats() {
+      el.statTotal.textContent = state.items.length;
+      el.statWrong.textContent = state.items.reduce((sum, item) => sum + item.wrongLetters.length, 0);
+      el.statMastered.textContent = state.items.filter(item => item.mastered).length;
+      el.statSubjects.textContent = new Set(state.items.map(item => item.subject).filter(Boolean)).size;
+    }
+
+    function refreshAll() {
+      refreshStats();
+      refreshSubjectFilter();
+      renderReview();
+      renderManage();
+      updatePreview();
+    }
+
+    function exportData() {
+      const payload = {
+        exportedAt: new Date().toISOString(),
+        groupId: APP_CONFIG.groupId,
+        items: state.items,
+      };
+      const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json;charset=utf-8" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `法考错选复习-${formatDate(new Date().toISOString())}.json`;
+      document.body.append(a);
+      a.click();
+      a.remove();
+      window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+      showToast("已导出当前共享题库");
+    }
+
+    function importData(file) {
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = async () => {
+        try {
+          const parsed = JSON.parse(reader.result);
+          const items = Array.isArray(parsed) ? parsed : parsed.items;
+          if (!Array.isArray(items)) throw new Error("Invalid format");
+          const result = await api("/api/import", { method: "POST", body: JSON.stringify({ items }) });
+          await load();
+          refreshAll();
+          showToast(`已导入 ${result.count || items.length} 道`);
+        } catch (error) {
+          console.error(error);
+          showToast(error.message || "导入文件格式不对");
+        }
+      };
+      reader.readAsText(file);
+    }
+
+    function shuffleReview() {
+      const ids = filteredItems().map(item => item.id);
+      for (let i = ids.length - 1; i > 0; i -= 1) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [ids[i], ids[j]] = [ids[j], ids[i]];
+      }
+      state.reviewOrder = ids;
+      renderReview();
+      showToast("已随机排序");
+    }
+
+    function insertSample() {
+      el.rawText.value = `【单选题】甲将房屋出卖给乙并交付钥匙，但尚未办理过户登记。后甲又将该房屋出卖给不知情的丙并办理登记。关于该房屋所有权，下列哪一说法是正确的？
+A. 乙因先受交付取得所有权
+B. 丙因完成登记取得所有权
+C. 甲乙合同无效
+D. 甲丙合同当然无效
+我的答案：A
+正确答案：B
+解析：不动产物权变动以登记为生效要件。`;
+      handleParse();
+    }
+
+    function bindEvents() {
+      el.navButtons.forEach(button => {
+        button.addEventListener("click", () => switchView(button.dataset.viewButton));
+      });
+      document.querySelectorAll("[data-switch-view]").forEach(button => {
+        button.addEventListener("click", () => switchView(button.dataset.switchView));
+      });
+      document.getElementById("parseButton").addEventListener("click", handleParse);
+      document.getElementById("saveButton").addEventListener("click", handleSave);
+      document.getElementById("resetButton").addEventListener("click", resetForm);
+      document.getElementById("newButton").addEventListener("click", resetForm);
+      document.getElementById("sampleButton").addEventListener("click", insertSample);
+      document.getElementById("imageInput").addEventListener("change", event => handleImageUpload(event.target.files[0]));
+      document.getElementById("captureWindowButton").addEventListener("click", captureWindowImage);
+      document.getElementById("clearImageButton").addEventListener("click", clearAttachedImage);
+      document.getElementById("exportButton").addEventListener("click", exportData);
+      document.getElementById("importInput").addEventListener("change", event => importData(event.target.files[0]));
+      document.getElementById("shuffleButton").addEventListener("click", shuffleReview);
+      document.getElementById("clearButton").addEventListener("click", () => {
+        if (!state.items.length) {
+          showToast("当前没有错题");
+          return;
+        }
+        openConfirm("清空全部错题？", "会清空共享题库和已保存的截图，建议先导出备份。", async () => {
+          try {
+            await api("/api/items", { method: "DELETE" });
+            state.items = [];
+            refreshAll();
+            showToast("已清空共享题库");
+          } catch (error) {
+            console.error(error);
+            showToast(error.message || "清空 Supabase 共享题库失败");
+          }
+        });
+      });
+      [el.searchInput, el.subjectFilter, el.statusFilter].forEach(node => {
+        node.addEventListener("input", renderReview);
+        node.addEventListener("change", renderReview);
+      });
+      [el.subjectInput, el.sourceInput, el.questionInput, el.noteInput].forEach(node => {
+        node.addEventListener("input", updatePreview);
+      });
+      el.dialogLayer.addEventListener("click", event => {
+        if (event.target === el.dialogLayer && el.dialogLayer.dataset.locked !== "true") closeDialog();
+      });
+    }
+
+    renderOptionInputs();
+    bindEvents();
+    load().finally(() => {
+      refreshAll();
+      switchView("review");
+    });
+  </script>
+</body>
+</html>
